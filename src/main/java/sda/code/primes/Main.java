@@ -7,21 +7,29 @@ import java.util.function.Supplier;
 public class Main {
     private final Supplier<Integer> input;
     private final Predicate<Integer> primeChecker;
+    private final Action akcja;
 
     public static void main(String[] args) {
         try (Scanner scan = new Scanner(System.in)) {
             new Main(
                     () -> scan.nextInt(),
 //                  new PrimeChecker()
-                    x -> new PrimeChecker().isPrime(x)
+                    x -> new PrimeChecker().isPrime(x),
+                    new AkcjaNaKonsolę()
             ).run();
         }
     }
 
 //  public Main(Supplier<Integer> input, PrimeChecker primeChecker) {
-    public Main(Supplier<Integer> input, Predicate<Integer> primeChecker) {
+//  public Main(Supplier<Integer> input, Predicate<Integer> primeChecker) {
+    public Main(
+            Supplier<Integer> input,
+            Predicate<Integer> primeChecker,
+            Action akcja
+    ) {
         this.input = input;
         this.primeChecker = primeChecker;
+        this.akcja = akcja;
     }
 
     void run() {
@@ -29,18 +37,10 @@ public class Main {
 //      boolean isPrime = primeChecker.isPrime(number);
         boolean isPrime = primeChecker.test(number);
         if (isPrime) {
-            success();
+            akcja.success();
         } else {
-            failure();
+            akcja.failure();
         }
-    }
-
-    void success() {
-        System.out.println("To jest liczba pierwsza");
-    }
-
-    void failure() {
-        System.out.println("To NIE jest liczba pierwsza");
     }
 
 }

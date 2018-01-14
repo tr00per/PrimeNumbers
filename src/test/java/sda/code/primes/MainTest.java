@@ -1,22 +1,16 @@
 package sda.code.primes;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MainTest {
 
 //    @Test
-//    public void jestPiersze() {
+//    public void jestPierwsza() {
 //        PrimeChecker checker = Mockito.mock(PrimeChecker.class);
 //        Mockito.when(checker.isPrime(Mockito.anyInt())).thenReturn(true);
 //
@@ -34,7 +28,6 @@ public class MainTest {
 //    }
 
     static class AlwaysTruePredicate implements Predicate<Integer> {
-
         private final AtomicBoolean predicateWasRun;
         private final int expectedInt;
 
@@ -55,21 +48,56 @@ public class MainTest {
 //        return x == 0;
 //    }
 
-    @Test
-    public void jestPiersze() {
-        AtomicBoolean predicateWasRun = new AtomicBoolean(false);
+//    @Test
+//    public void jestPierwsza() {
+//        AtomicBoolean predicateWasRun = new AtomicBoolean(false);
+//
+//        Main main = Mockito.spy(new Main(
+//                () -> 0,
+//                new AlwaysTruePredicate(predicateWasRun, 0)
+////                this::test
+//        ));
+//
+//        main.run();
+//
+//        assertTrue(predicateWasRun.get());
+//
+//        Mockito.verify(main).success();
+//        Mockito.verify(main, Mockito.never()).failure();
+//    }
 
-        Main main = Mockito.spy(new Main(
+    static class ShallBeSuccessfulAction implements Action {
+        private final AtomicBoolean actionWasRun;
+
+        public ShallBeSuccessfulAction(AtomicBoolean actionWasRun) {
+            this.actionWasRun = actionWasRun;
+        }
+
+        @Override
+        public void success() {
+            actionWasRun.set(true);
+        }
+
+        @Override
+        public void failure() {
+            fail("Wywołano nieprawidłową akcję");
+        }
+    }
+
+    @Test
+    public void jestPierwsza() {
+        AtomicBoolean predicateWasRun = new AtomicBoolean(false);
+        AtomicBoolean actionWasRun = new AtomicBoolean(false);
+
+        Main main = new Main(
                 () -> 0,
-                new AlwaysTruePredicate(predicateWasRun, 0)
-//                this::test
-        ));
+                new AlwaysTruePredicate(predicateWasRun, 0),
+                new ShallBeSuccessfulAction(actionWasRun)
+        );
 
         main.run();
 
-        assertTrue(predicateWasRun.get());
-
-        Mockito.verify(main).success();
-        Mockito.verify(main, Mockito.never()).failure();
+        assertTrue("Predykat nie został wywołany", predicateWasRun.get());
+        assertTrue("Akcja nie została wywołana", actionWasRun.get());
     }
 }
